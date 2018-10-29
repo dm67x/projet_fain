@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.7)
 
 set(project_name fain_projet)
 
-project(${project_name} LANGUAGES CXX)
+project(${project_name} LANGUAGES C)
 
-file(GLOB_RECURSE source_files src/**/*.cpp src/*.cpp)
+file(GLOB_RECURSE source_files src/**/*.c src/*.c)
 file(GLOB_RECURSE header_files src/**/*.h src/*.h)
 
 find_package(GLUT REQUIRED)
