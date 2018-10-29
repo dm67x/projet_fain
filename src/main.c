@@ -2,9 +2,11 @@
 #include <GL/gl.h>
 #include <stdio.h>
 
-#include "stack.h"
+#define DEBUG 1
 
-static Stack * pointsStack;
+#include "polygon.h"
+
+static Polygone * polygone;
 static int fx, fy;
 static int first;
 
@@ -14,7 +16,7 @@ void display_func() {
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawStack(pointsStack);
+    drawPolygon(polygone);
 
     glutSwapBuffers();
 }
@@ -24,29 +26,31 @@ void keyboard_func(unsigned char key, int x, int y) {
     (void)y;
     if (key == 27) {
         exit(0);
-    } else if (key == 99) {
-        Point p = topStack(pointsStack);
-        pointsStack = pushStack(pointsStack, (Point) { fx, fy });
+    } else if (key == 'c') {
+        Point p = polygone->p;
+        polygone = addPointToPolygon(polygone, (Point) { fx, fy });
         fx = p.x;
         fy = p.y;
+    } else if (key == 'f') {
+
     }
     glutPostRedisplay();
 }
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-        printf("%d %d\n", x, y);
         if (first) {
             first = 0;
             fx = x; fy = y;
         }
-        pointsStack = pushStack(pointsStack, (Point){ x, y });
+        polygone = addPointToPolygon(polygone, (Point){ x, y });
     }
     glutPostRedisplay();
 }
 
 int main(int argc, char ** argv) {
     int width = 800, height = 800;
+#ifndef DEBUG
     if (argc < 2 || argc > 3) {
         fprintf(stderr, "Usage: %s width [height]\n", argv[0]);
         return EXIT_FAILURE;
@@ -58,13 +62,14 @@ int main(int argc, char ** argv) {
             height = atoi(argv[2]);
         }
     }
+#endif
 
     glutInitWindowSize(width, height);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
     glutInit(&argc, argv);
     glutCreateWindow("FAIN - Projet");
 
-    pointsStack = newStack();
+    polygone = newPolygon();
     first = 1;
     fx = fy = 0;
 
