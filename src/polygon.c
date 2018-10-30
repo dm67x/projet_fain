@@ -52,10 +52,14 @@ Point getPointFromPolygon(Polygone * p, int index) {
     return (Point) { -1, -1 };
 }
 
-Polygone * replacePointFromPolygon(Polygone * p, int index, Point pt) {
-    p = deletePointFromPolygon(p, index);
-    p = addPointToPolygon(p, index, pt);
-    return p;
+void updatePointFromPolygone(Polygone * p, int index, Point pt) {
+    if (sizePolygon(p) < index) return;
+    for (int i = 0; p != NULL; p = p->next, i++) {
+        if (index == i) {
+            p->p = pt;
+            break;
+        }
+    }
 }
 
 Polygone * deletePointFromPolygon(Polygone * p, int index) {

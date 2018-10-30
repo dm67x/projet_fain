@@ -13,7 +13,7 @@ Polygone * newPolygon();
 Polygone * addPointToPolygon(Polygone * p, int index, Point pt);
 Polygone * deletePointFromPolygon(Polygone * p, int index);
 Point getPointFromPolygon(Polygone * p, int index);
-Polygone * replacePointFromPolygon(Polygone * p, int index, Point pt);
+void updatePointFromPolygone(Polygone * p, int index, Point pt);
 int sizePolygon(Polygone * p);
 void drawPolygon(Polygone * p);
 

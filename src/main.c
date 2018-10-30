@@ -53,41 +53,89 @@ void display_func() {
 void keyboard_func(unsigned char key, int x, int y) {
     (void)x;
     (void)y;
-    if (key == 27) {
+    Point p;
+
+    switch (key) {
+    case 27:
         exit(0);
-    } else if (key == 'c') {
-        Point p = polygone->p;
+
+    case 'c':
+        p = polygone->p;
         polygone = addPointToPolygon(polygone, nb_points, (Point) { fx, fy });
         nb_points++;
         fx = p.x;
         fy = p.y;
-        current_mode = NONE;
-    } else if (key == 'f') {
+        break;
+
+    case 'f':
         fill = !fill;
-        current_mode = NONE;
-    } else if (key == 'i') {
-        current_mode = INSERT;
-    } else if (key == 'v') {
+        break;
+
+    case 'i':
+        current_mode = current_mode == INSERT ? NONE : INSERT;
+        break;
+
+    case 'v':
         selectedPoint = 0;
-        current_mode = VERTEX;
-    } else if (key == 'e') {
-        current_mode = EDGE;
+        current_mode = current_mode == VERTEX ? NONE : VERTEX;
+        break;
+
+    case 'e':
+        current_mode = current_mode == EDGE ? NONE : EDGE;
+        break;
     }
     glutPostRedisplay();
 }
 
 void special_func(int key, int x, int y) {
+    Point p;
+
     switch (current_mode) {
     case VERTEX:
-        if (key == GLUT_KEY_PAGE_UP) {
+        switch (key) {
+        case GLUT_KEY_PAGE_UP:
             selectedPoint = (selectedPoint + 1) % sizePolygon(polygone);
-        } else if (key == GLUT_KEY_PAGE_DOWN) {
+            break;
+
+        case GLUT_KEY_PAGE_DOWN:
             selectedPoint = abs((selectedPoint - 1) % sizePolygon(polygone));
-        } else if (key == GLUT_KEY_END) {
+            break;
+
+        case GLUT_KEY_END:
+            if (selectedPoint < 0) return;
             polygone = deletePointFromPolygon(polygone, selectedPoint);
             int size_poly = sizePolygon(polygone);
             selectedPoint = size_poly > 0 ? abs((selectedPoint - 1) % size_poly) : -1;
             nb_points--;
+            break;
+
+        case GLUT_KEY_UP:
+            if (selectedPoint < 0) return;
+            p = getPointFromPolygon(polygone, selectedPoint);
+            p.y--;
+            updatePointFromPolygone(polygone, selectedPoint, p);
+            break;
+
+        case GLUT_KEY_DOWN:
+            if (selectedPoint < 0) return;
+            p = getPointFromPolygon(polygone, selectedPoint);
+            p.y++;
+            updatePointFromPolygone(polygone, selectedPoint, p);
+            break;
+
+        case GLUT_KEY_LEFT:
+            if (selectedPoint < 0) return;
+            p = getPointFromPolygon(polygone, selectedPoint);
+            p.x--;
+            updatePointFromPolygone(polygone, selectedPoint, p);
+            break;
+
+        case GLUT_KEY_RIGHT:
+            if (selectedPoint < 0) return;
+            p = getPointFromPolygon(polygone, selectedPoint);
+            p.x++;
+            updatePointFromPolygone(polygone, selectedPoint, p);
+            break;
         }
         break;
     }
