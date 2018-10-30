@@ -85,6 +85,9 @@ void special_func(int key, int x, int y) {
             selectedPoint = abs((selectedPoint - 1) % sizePolygon(polygone));
         } else if (key == GLUT_KEY_END) {
             polygone = deletePointFromPolygon(polygone, selectedPoint);
+            int size_poly = sizePolygon(polygone);
+            selectedPoint = size_poly > 0 ? abs((selectedPoint - 1) % size_poly) : -1;
+            nb_points--;
         }
         break;
     }
@@ -93,7 +96,7 @@ void special_func(int key, int x, int y) {
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
-        if (first) {
+        if (first || sizePolygon(polygone) == 0) {
             first = 0;
             fx = x; fy = y;
         }

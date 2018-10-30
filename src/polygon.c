@@ -37,6 +37,7 @@ Polygone * addPointToPolygon(Polygone * p, int index, Point pt) {
             break;
         }
         i++;
+        tmp = tmp->next;
     }
 
     return p;
@@ -59,13 +60,28 @@ Polygone * replacePointFromPolygon(Polygone * p, int index, Point pt) {
 
 Polygone * deletePointFromPolygon(Polygone * p, int index) {
     if (p == NULL) return NULL;
-    if (sizePolygon(p) < index) return p;
+    int size = sizePolygon(p);
+
+    if (size < index) return p;
+
+    if (size == 1) {
+        free(p);
+        return NULL;
+    }
 
     if (index == 0) {
         Polygone * n = p->next;
         n->prev = NULL;
         free(p);
         return n;
+    }
+
+    if (index == size - 1) {
+        Polygone * last = p;
+        for (; last->next != NULL; last = last->next);
+        last->prev->next = NULL;
+        free(last);
+        return p;
     }
 
     Polygone * tmp = p->next;
