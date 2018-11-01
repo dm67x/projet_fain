@@ -1,3 +1,7 @@
+#if WIN32
+#include <windows.h>
+#endif
+
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <stdio.h>

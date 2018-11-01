@@ -1,3 +1,7 @@
+#if WIN32
+#include <windows.h>
+#endif
+
 #include "polygon.h"
 #include <stdlib.h>
 #include "bresenham.h"

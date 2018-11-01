@@ -1,3 +1,7 @@
+#if WIN32
+#include <windows.h>
+#endif
+
 #include "bresenham.h"
 #include <GL/gl.h>
 #include <math.h>

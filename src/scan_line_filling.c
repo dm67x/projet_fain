@@ -1,3 +1,7 @@
+#if WIN32
+#include <windows.h>
+#endif
+
 #include "scan_line_filling.h"
 #include <stdlib.h>
 #include <GL/gl.h>
