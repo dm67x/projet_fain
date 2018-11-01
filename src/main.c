@@ -4,6 +4,7 @@
 
 #define DEBUG 1
 
+#include "bresenham.h"
 #include "polygon.h"
 #include "scan_line_filling.h"
 
@@ -40,6 +41,13 @@ void display_func() {
         glVertex2i(p.x + 8, p.y + 8);
         glVertex2i(p.x - 8, p.y + 8);
         glEnd();
+    } else if (selectedPoint >= 0 && current_mode == EDGE) {
+        glColor3f(1.0f, 0.0f, 0.0f);
+        Point p = getPointFromPolygon(polygone, selectedPoint);
+        if (selectedPoint + 1 < sizePolygon(polygone)) {
+            Point p2 = getPointFromPolygon(polygone, selectedPoint + 1);
+            bresenham(p, p2);
+        }
     }
 
     if (fill) {
@@ -81,6 +89,7 @@ void keyboard_func(unsigned char key, int x, int y) {
         break;
 
     case 'e':
+        selectedPoint = 0;
         current_mode = current_mode == EDGE ? NONE : EDGE;
         break;
     }
@@ -135,6 +144,18 @@ void special_func(int key, int x, int y) {
             p = getPointFromPolygon(polygone, selectedPoint);
             p.x++;
             updatePointFromPolygone(polygone, selectedPoint, p);
+            break;
+        }
+        break;
+
+    case EDGE:
+        switch (key) {
+        case GLUT_KEY_PAGE_UP:
+            selectedPoint = (selectedPoint + 1) % sizePolygon(polygone);
+            break;
+
+        case GLUT_KEY_PAGE_DOWN:
+            selectedPoint = abs((selectedPoint - 1) % sizePolygon(polygone));
             break;
         }
         break;
