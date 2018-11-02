@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <GL/gl.h>
 
-void find_min_max(Polygone * polygone, Point * min, Point * max) {
+void find_min_max(Polygone polygone, Point * min, Point * max) {
     if (polygone == NULL) return;
     *min = *max = polygone->p;
     polygone = polygone->next;
@@ -19,7 +19,7 @@ void find_min_max(Polygone * polygone, Point * min, Point * max) {
     }
 }
 
-void find_intersections(Polygone * polygone, Point * intersections) {
+void find_intersections(Polygone polygone, Point * intersections) {
     Point min, max;
     find_min_max(polygone, &min, &max);
 
@@ -28,7 +28,7 @@ void find_intersections(Polygone * polygone, Point * intersections) {
     }
 }
 
-void scan_line_fill(Polygone * polygone) {
+void scan_line_fill(Polygone polygone) {
     Point min, max;
 
     glBegin(GL_LINES);

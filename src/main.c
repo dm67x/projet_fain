@@ -13,10 +13,10 @@
 #include "scan_line_filling.h"
 
 static Polygone * polygone;
-static int fx, fy;
-static int first;
 static int fill;
+static int last_closed_index;
 static int selectedPoint;
+static int selectedEdge;
 static int nb_points;
 
 enum MODE {
@@ -29,10 +29,10 @@ enum MODE {
 static enum MODE current_mode = NONE;
 
 void display_func() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(0.0f, 0.0f, 0.0f);
 
     drawPolygon(polygone);
 
@@ -45,11 +45,11 @@ void display_func() {
         glVertex2i(p.x + 8, p.y + 8);
         glVertex2i(p.x - 8, p.y + 8);
         glEnd();
-    } else if (selectedPoint >= 0 && current_mode == EDGE) {
+    } else if (selectedEdge >= 0 && current_mode == EDGE) {
         glColor3f(1.0f, 0.0f, 0.0f);
-        Point p = getPointFromPolygon(polygone, selectedPoint);
-        if (selectedPoint + 1 < sizePolygon(polygone)) {
-            Point p2 = getPointFromPolygon(polygone, selectedPoint + 1);
+        Point p = getPointFromPolygon(polygone, selectedEdge);
+        if ((selectedEdge + 1) < sizePolygon(polygone)) {
+            Point p2 = getPointFromPolygon(polygone, selectedEdge + 1);
             bresenham(p, p2);
         }
     }
@@ -72,11 +72,11 @@ void keyboard_func(unsigned char key, int x, int y) {
         exit(0);
 
     case 'c':
-        p = polygone->p;
-        polygone = addPointToPolygon(polygone, nb_points, (Point) { fx, fy });
-        nb_points++;
-        fx = p.x;
-        fy = p.y;
+		if (nb_points > 1 && last_closed_index != -1) {
+			polygone = addPointToPolygon(polygone, nb_points, getPointFromPolygon(polygone, last_closed_index));
+			last_closed_index = nb_points - 1;
+			nb_points++;
+		}
         break;
 
     case 'f':
@@ -85,16 +85,20 @@ void keyboard_func(unsigned char key, int x, int y) {
 
     case 'i':
         current_mode = current_mode == INSERT ? NONE : INSERT;
+		if (current_mode == INSERT) glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+		else glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
 
     case 'v':
         selectedPoint = 0;
         current_mode = current_mode == VERTEX ? NONE : VERTEX;
+		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
 
     case 'e':
         selectedPoint = 0;
         current_mode = current_mode == EDGE ? NONE : EDGE;
+		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
     }
     glutPostRedisplay();
@@ -169,10 +173,7 @@ void special_func(int key, int x, int y) {
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
-        if (first || sizePolygon(polygone) == 0) {
-            first = 0;
-            fx = x; fy = y;
-        }
+		if (last_closed_index == -1) last_closed_index = 0;
         polygone = addPointToPolygon(polygone, nb_points, (Point){ x, y });
         nb_points++;
     }
@@ -199,13 +200,11 @@ int main(int argc, char ** argv) {
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
     glutInit(&argc, argv);
     glutCreateWindow("FAIN - Projet");
-    glutSetCursor(GLUT_CURSOR_CROSSHAIR);
 
     polygone = newPolygon();
-    first = 1;
-    fx = fy = 0;
     fill = 0;
     selectedPoint = -1;
+	last_closed_index = -1;
     nb_points = 0;
 
     glViewport(0, 0, width, height);

@@ -8,13 +8,14 @@
 #include <GL/gl.h>
 #include <stdio.h>
 
-Polygone * newPolygon() {
+Polygone newPolygon() {
     return NULL;
 }
 
-Polygone * addPointToPolygon(Polygone * p, int index, Point pt) {
-    Polygone * n = (Polygone *)malloc(sizeof(struct PolygonePoint));
+Polygone addPointToPolygon(Polygone p, int index, Point pt) {
+    Polygone n = (Polygone)malloc(sizeof(struct PolygonePoint));
     n->p = pt;
+	n->closed_index = -1;
 
     if (p == NULL) {
         n->next = NULL;
@@ -31,7 +32,7 @@ Polygone * addPointToPolygon(Polygone * p, int index, Point pt) {
         return n;
     }
 
-    Polygone * tmp = p;
+    Polygone tmp = p;
     int i = 1;
     while (tmp != NULL) {
         if (i == index) {
@@ -47,7 +48,7 @@ Polygone * addPointToPolygon(Polygone * p, int index, Point pt) {
     return p;
 }
 
-Point getPointFromPolygon(Polygone * p, int index) {
+Point getPointFromPolygon(Polygone p, int index) {
     for(int i = 0; p != NULL; p = p->next, i++) {
         if (i == index) {
             return p->p;
@@ -56,7 +57,7 @@ Point getPointFromPolygon(Polygone * p, int index) {
     return (Point) { -1, -1 };
 }
 
-void updatePointFromPolygone(Polygone * p, int index, Point pt) {
+void updatePointFromPolygone(Polygone p, int index, Point pt) {
     if (sizePolygon(p) < index) return;
     for (int i = 0; p != NULL; p = p->next, i++) {
         if (index == i) {
@@ -66,7 +67,7 @@ void updatePointFromPolygone(Polygone * p, int index, Point pt) {
     }
 }
 
-Polygone * deletePointFromPolygon(Polygone * p, int index) {
+Polygone deletePointFromPolygon(Polygone p, int index) {
     if (p == NULL) return NULL;
     int size = sizePolygon(p);
 
@@ -78,26 +79,26 @@ Polygone * deletePointFromPolygon(Polygone * p, int index) {
     }
 
     if (index == 0) {
-        Polygone * n = p->next;
+        Polygone n = p->next;
         n->prev = NULL;
         free(p);
         return n;
     }
 
     if (index == size - 1) {
-        Polygone * last = p;
+        Polygone last = p;
         for (; last->next != NULL; last = last->next);
         last->prev->next = NULL;
         free(last);
         return p;
     }
 
-    Polygone * tmp = p->next;
+    Polygone tmp = p->next;
     int i = 1;
     while (tmp != NULL) {
         if (i == index) {
-            Polygone * prev = tmp->prev;
-            Polygone * next = tmp->next;
+            Polygone prev = tmp->prev;
+            Polygone next = tmp->next;
             free(tmp);
             prev->next = next;
             next->prev = prev;
@@ -109,14 +110,14 @@ Polygone * deletePointFromPolygon(Polygone * p, int index) {
     return p;
 }
 
-int sizePolygon(Polygone * p) {
+int sizePolygon(Polygone p) {
     if (p == NULL) return 0;
     int i;
     for (i = 0; p != NULL; p = p->next, i++);
     return i;
 }
 
-void drawPolygon(Polygone * p) {
+void drawPolygon(Polygone p) {
     if (p == NULL) return;
     if (sizePolygon(p) == 1) {
         glBegin(GL_POINTS);
@@ -126,7 +127,7 @@ void drawPolygon(Polygone * p) {
     }
 
     Point p1 = p->p;
-    p = p->next;
+	p = p->next;
 
     for (; p != NULL; p = p->next) {
         Point p2 = p->p;
