@@ -12,12 +12,8 @@
 #include "polygon.h"
 #include "scan_line_filling.h"
 
-static Polygone * polygone;
-static int fill;
-static int last_closed_index;
-static int selectedPoint;
-static int selectedEdge;
-static int nb_points;
+Polygone polygone, currentNode;
+int fill;
 
 enum MODE {
     NONE,
@@ -26,37 +22,37 @@ enum MODE {
     EDGE
 };
 
-static enum MODE current_mode = NONE;
+enum MODE current_mode = NONE;
 
 void display_func() {
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glColor3f(0.0f, 0.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
 
     drawPolygon(polygone);
 
-    if (selectedPoint >= 0 && current_mode == VERTEX) {
+    if (current_mode == VERTEX && currentNode) {
         glColor3f(1.0f, 0.0f, 0.0f);
         glBegin(GL_QUADS);
-        Point p = getPointFromPolygon(polygone, selectedPoint);
+        Point p = currentNode->point;
         glVertex2i(p.x - 8, p.y - 8);
         glVertex2i(p.x + 8, p.y - 8);
         glVertex2i(p.x + 8, p.y + 8);
         glVertex2i(p.x - 8, p.y + 8);
         glEnd();
-    } else if (selectedEdge >= 0 && current_mode == EDGE) {
+    } else if (current_mode == EDGE && currentNode) {
         glColor3f(1.0f, 0.0f, 0.0f);
-        Point p = getPointFromPolygon(polygone, selectedEdge);
-        if ((selectedEdge + 1) < sizePolygon(polygone)) {
-            Point p2 = getPointFromPolygon(polygone, selectedEdge + 1);
+        Point p = currentNode->point;
+        if (currentNode->next) {
+            Point p2 = currentNode->next->point;
             bresenham(p, p2);
         }
     }
 
     if (fill) {
         glColor3f(1.0f, 0.0f, 1.0f);
-        scan_line_fill(polygone);
+        //scan_line_fill(polygone);
     }
 
     glutSwapBuffers();
@@ -65,18 +61,12 @@ void display_func() {
 void keyboard_func(unsigned char key, int x, int y) {
     (void)x;
     (void)y;
-    Point p;
 
     switch (key) {
     case 27:
         exit(0);
 
     case 'c':
-		if (nb_points > 1 && last_closed_index != -1) {
-			polygone = addPointToPolygon(polygone, nb_points, getPointFromPolygon(polygone, last_closed_index));
-			last_closed_index = nb_points - 1;
-			nb_points++;
-		}
         break;
 
     case 'f':
@@ -90,14 +80,14 @@ void keyboard_func(unsigned char key, int x, int y) {
         break;
 
     case 'v':
-        selectedPoint = 0;
         current_mode = current_mode == VERTEX ? NONE : VERTEX;
+        currentNode = polygone;
 		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
 
     case 'e':
-        selectedPoint = 0;
         current_mode = current_mode == EDGE ? NONE : EDGE;
+        currentNode = polygone;
 		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
     }
@@ -111,47 +101,39 @@ void special_func(int key, int x, int y) {
     case VERTEX:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            selectedPoint = (selectedPoint + 1) % sizePolygon(polygone);
+            nextPointFromPolygon(polygone, &currentNode);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            selectedPoint = abs((selectedPoint - 1) % sizePolygon(polygone));
+            prevPointFromPolygon(polygone, &currentNode);
             break;
 
         case GLUT_KEY_END:
-            if (selectedPoint < 0) return;
-            polygone = deletePointFromPolygon(polygone, selectedPoint);
-            int size_poly = sizePolygon(polygone);
-            selectedPoint = size_poly > 0 ? abs((selectedPoint - 1) % size_poly) : -1;
-            nb_points--;
+            polygone = deletePointFromPolygon(polygone, &currentNode);
             break;
 
         case GLUT_KEY_UP:
-            if (selectedPoint < 0) return;
-            p = getPointFromPolygon(polygone, selectedPoint);
+            p = currentNode->point;
             p.y--;
-            updatePointFromPolygone(polygone, selectedPoint, p);
+            currentNode->point = p;
             break;
 
         case GLUT_KEY_DOWN:
-            if (selectedPoint < 0) return;
-            p = getPointFromPolygon(polygone, selectedPoint);
+            p = currentNode->point;
             p.y++;
-            updatePointFromPolygone(polygone, selectedPoint, p);
+            currentNode->point = p;
             break;
 
         case GLUT_KEY_LEFT:
-            if (selectedPoint < 0) return;
-            p = getPointFromPolygon(polygone, selectedPoint);
+            p = currentNode->point;
             p.x--;
-            updatePointFromPolygone(polygone, selectedPoint, p);
+            currentNode->point = p;
             break;
 
         case GLUT_KEY_RIGHT:
-            if (selectedPoint < 0) return;
-            p = getPointFromPolygon(polygone, selectedPoint);
+            p = currentNode->point;
             p.x++;
-            updatePointFromPolygone(polygone, selectedPoint, p);
+            currentNode->point = p;
             break;
         }
         break;
@@ -159,11 +141,11 @@ void special_func(int key, int x, int y) {
     case EDGE:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            selectedPoint = (selectedPoint + 1) % sizePolygon(polygone);
+            nextPointFromPolygon(polygone, &currentNode);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            selectedPoint = abs((selectedPoint - 1) % sizePolygon(polygone));
+            prevPointFromPolygon(polygone, &currentNode);
             break;
         }
         break;
@@ -173,9 +155,7 @@ void special_func(int key, int x, int y) {
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
-		if (last_closed_index == -1) last_closed_index = 0;
-        polygone = addPointToPolygon(polygone, nb_points, (Point){ x, y });
-        nb_points++;
+        polygone = addPointToPolygon(polygone, (Point){ x, y });
     }
     glutPostRedisplay();
 }
@@ -202,10 +182,8 @@ int main(int argc, char ** argv) {
     glutCreateWindow("FAIN - Projet");
 
     polygone = newPolygon();
+    currentNode = polygone;
     fill = 0;
-    selectedPoint = -1;
-	last_closed_index = -1;
-    nb_points = 0;
 
     glViewport(0, 0, width, height);
 

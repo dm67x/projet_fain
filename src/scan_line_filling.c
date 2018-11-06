@@ -8,10 +8,10 @@
 
 void find_min_max(Polygone polygone, Point * min, Point * max) {
     if (polygone == NULL) return;
-    *min = *max = polygone->p;
+    *min = *max = polygone->point;
     polygone = polygone->next;
     for (; polygone != NULL; polygone = polygone->next) {
-        Point pt = polygone->p;
+        Point pt = polygone->point;
         if (min->x > pt.x) min->x = pt.x;
         if (max->x < pt.x) max->x = pt.x;
         if (min->y > pt.y) min->y = pt.y;

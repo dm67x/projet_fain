@@ -3,19 +3,19 @@
 
 #include "point.h"
 
-typedef struct PolygonePoint {
-    struct PolygonePoint * next;
-    struct PolygonePoint * prev;
-	Point p;
-	int closed_index;
-} *Polygone;
+struct _polygone {
+    struct _polygone * prev;
+    struct _polygone * next;
+    Point point;
+};
+
+typedef struct _polygone * Polygone;
 
 Polygone newPolygon();
-Polygone addPointToPolygon(Polygone p, int index, Point pt);
-Polygone deletePointFromPolygon(Polygone p, int index);
-Point getPointFromPolygon(Polygone p, int index);
-void updatePointFromPolygone(Polygone p, int index, Point pt);
-int sizePolygon(Polygone p);
-void drawPolygon(Polygone p);
+Polygone addPointToPolygon(Polygone poly, Point p);
+Polygone deletePointFromPolygon(Polygone poly, Polygone * current);
+void nextPointFromPolygon(Polygone poly, Polygone * current);
+void prevPointFromPolygon(Polygone poly, Polygone * current);
+void drawPolygon(Polygone poly);
 
 #endif // POLYGON_H
