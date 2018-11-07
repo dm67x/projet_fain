@@ -3,8 +3,6 @@
 
 #include "point.h"
 
-#define MAX_SOMMETS 1000
-
 struct _sommet {
     struct _sommet * next;
     struct _sommet * prev;

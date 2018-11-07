@@ -7,7 +7,6 @@
 #include "bresenham.h"
 #include <GL/gl.h>
 #include <stdio.h>
-#include <math.h>
 
 Polygone newPolygone() {
     Polygone poly;

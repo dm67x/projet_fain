@@ -50,7 +50,7 @@ void display_func() {
 
     if (fill) {
         glColor3f(1.0f, 0.0f, 1.0f);
-        //scan_line_fill(polygone);
+        scan_line_fill(polygone);
     }
 
     glutSwapBuffers();
