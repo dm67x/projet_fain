@@ -159,6 +159,8 @@ void special_func(int key, int x, int y) {
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
         addPointToPolygone(&polygone, (Point){ x, y });
+    } else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP && current_mode == EDGE) {
+        scinderArcInsidePolygone(&polygone);
     }
     glutPostRedisplay();
 }
