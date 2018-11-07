@@ -103,7 +103,6 @@ void prevPointInsidePolygone(Polygone * poly) {
 }
 
 void closePolygone(Polygone * poly) {
-    addPointToPolygone(poly, poly->last->next->point);
     poly->is_closed = 1;
 }
 
@@ -115,7 +114,9 @@ void drawPolygone(Polygone poly) {
     if (!poly.sommets) return;
 
     struct _sommet * sommet = poly.sommets;
-    Point p1 = sommet->point;
+    Point p1, p2;
+
+    p1 = sommet->point;
 
     if (sommet == sommet->next) {
         glBegin(GL_POINTS);
@@ -127,9 +128,15 @@ void drawPolygone(Polygone poly) {
     sommet = sommet->next;
 
     while (sommet != poly.sommets) {
-        Point p2 = sommet->point;
+        p2 = sommet->point;
         bresenham(p1, p2);
         p1 = p2;
         sommet = sommet->next;
+    }
+
+    if (poly.is_closed) {
+        p1 = poly.sommets->point;
+        p2 = poly.last->point;
+        bresenham(p1, p2);
     }
 }

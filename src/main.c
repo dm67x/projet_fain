@@ -44,10 +44,8 @@ void display_func() {
     } else if (current_mode == EDGE && polygone.current) {
         glColor3f(1.0f, 0.0f, 0.0f);
         Point p = polygone.current->point;
-        if (polygone.current->next) {
-            Point p2 = polygone.current->next->point;
-            bresenham(p, p2);
-        }
+        Point p2 = polygone.current->next->point;
+        bresenham(p, p2);
     }
 
     if (fill) {
@@ -90,6 +88,7 @@ void keyboard_func(unsigned char key, int x, int y) {
         break;
 
     case 'e':
+        if (polygone.nb_sommets < 2) return;
         current_mode = current_mode == EDGE ? NONE : EDGE;
         polygone.current = polygone.sommets;
         glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
