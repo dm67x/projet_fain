@@ -31,11 +31,4 @@ void prevPointInsidePolygone(Polygone * poly);
 void closePolygone(Polygone * poly);
 void openPolygone(Polygone * poly);
 
-/*Polygone newPolygon();
-Polygone addPointToPolygon(Polygone poly, Point p);
-Polygone deletePointFromPolygon(Polygone poly, Polygone * current);
-void nextPointFromPolygon(Polygone poly, Polygone * current);
-void prevPointFromPolygon(Polygone poly, Polygone * current);
-void drawPolygon(Polygone poly);*/
-
 #endif // POLYGON_H
