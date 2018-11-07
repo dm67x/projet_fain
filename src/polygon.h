@@ -3,19 +3,39 @@
 
 #include "point.h"
 
-struct _polygone {
-    struct _polygone * prev;
-    struct _polygone * next;
+#define MAX_SOMMETS 1000
+
+struct _sommet {
+    struct _sommet * next;
+    struct _sommet * prev;
     Point point;
 };
 
-typedef struct _polygone * Polygone;
+struct _polygone {
+    struct _sommet * sommets;
+    struct _sommet * last; // dernier sommet
+    struct _sommet * current; // sommet courant selectionné
+    int nb_sommets; // nombre de sommets réels
+    char is_closed; // si polygone fermé
+};
 
-Polygone newPolygon();
+typedef struct _polygone Polygone;
+
+Polygone newPolygone();
+void addPointToPolygone(Polygone * poly, Point p);
+void removePointFromPolygone(Polygone * poly, struct _sommet * sommet);
+void drawPolygone(Polygone poly);
+void scinderArcInsidePolygone(Polygone * poly);
+void nextPointInsidePolygone(Polygone * poly);
+void prevPointInsidePolygone(Polygone * poly);
+void closePolygone(Polygone * poly);
+void openPolygone(Polygone * poly);
+
+/*Polygone newPolygon();
 Polygone addPointToPolygon(Polygone poly, Point p);
 Polygone deletePointFromPolygon(Polygone poly, Polygone * current);
 void nextPointFromPolygon(Polygone poly, Polygone * current);
 void prevPointFromPolygon(Polygone poly, Polygone * current);
-void drawPolygon(Polygone poly);
+void drawPolygon(Polygone poly);*/
 
 #endif // POLYGON_H

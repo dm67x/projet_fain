@@ -12,8 +12,8 @@
 #include "polygon.h"
 #include "scan_line_filling.h"
 
-Polygone polygone, currentNode;
-int fill;
+static Polygone polygone;
+static char fill;
 
 enum MODE {
     NONE,
@@ -30,22 +30,22 @@ void display_func() {
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawPolygon(polygone);
+    drawPolygone(polygone);
 
-    if (current_mode == VERTEX && currentNode) {
+    if (current_mode == VERTEX && polygone.current) {
         glColor3f(1.0f, 0.0f, 0.0f);
         glBegin(GL_QUADS);
-        Point p = currentNode->point;
+        Point p = polygone.current->point;
         glVertex2i(p.x - 8, p.y - 8);
         glVertex2i(p.x + 8, p.y - 8);
         glVertex2i(p.x + 8, p.y + 8);
         glVertex2i(p.x - 8, p.y + 8);
         glEnd();
-    } else if (current_mode == EDGE && currentNode) {
+    } else if (current_mode == EDGE && polygone.current) {
         glColor3f(1.0f, 0.0f, 0.0f);
-        Point p = currentNode->point;
-        if (currentNode->next) {
-            Point p2 = currentNode->next->point;
+        Point p = polygone.current->point;
+        if (polygone.current->next) {
+            Point p2 = polygone.current->next->point;
             bresenham(p, p2);
         }
     }
@@ -67,6 +67,10 @@ void keyboard_func(unsigned char key, int x, int y) {
         exit(0);
 
     case 'c':
+        if (polygone.is_closed)
+            openPolygone(&polygone);
+        else
+            closePolygone(&polygone);
         break;
 
     case 'f':
@@ -81,14 +85,14 @@ void keyboard_func(unsigned char key, int x, int y) {
 
     case 'v':
         current_mode = current_mode == VERTEX ? NONE : VERTEX;
-        currentNode = polygone;
-		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+        polygone.current = polygone.sommets;
+        glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
 
     case 'e':
         current_mode = current_mode == EDGE ? NONE : EDGE;
-        currentNode = polygone;
-		glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+        polygone.current = polygone.sommets;
+        glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         break;
     }
     glutPostRedisplay();
@@ -101,39 +105,39 @@ void special_func(int key, int x, int y) {
     case VERTEX:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            nextPointFromPolygon(polygone, &currentNode);
+            nextPointInsidePolygone(&polygone);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            prevPointFromPolygon(polygone, &currentNode);
+            prevPointInsidePolygone(&polygone);
             break;
 
         case GLUT_KEY_END:
-            polygone = deletePointFromPolygon(polygone, &currentNode);
+            removePointFromPolygone(&polygone, polygone.current);
             break;
 
         case GLUT_KEY_UP:
-            p = currentNode->point;
+            p = polygone.current->point;
             p.y--;
-            currentNode->point = p;
+            polygone.current->point = p;
             break;
 
         case GLUT_KEY_DOWN:
-            p = currentNode->point;
+            p = polygone.current->point;
             p.y++;
-            currentNode->point = p;
+            polygone.current->point = p;
             break;
 
         case GLUT_KEY_LEFT:
-            p = currentNode->point;
+            p = polygone.current->point;
             p.x--;
-            currentNode->point = p;
+            polygone.current->point = p;
             break;
 
         case GLUT_KEY_RIGHT:
-            p = currentNode->point;
+            p = polygone.current->point;
             p.x++;
-            currentNode->point = p;
+            polygone.current->point = p;
             break;
         }
         break;
@@ -141,11 +145,11 @@ void special_func(int key, int x, int y) {
     case EDGE:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            nextPointFromPolygon(polygone, &currentNode);
+            nextPointInsidePolygone(&polygone);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            prevPointFromPolygon(polygone, &currentNode);
+            prevPointInsidePolygone(&polygone);
             break;
         }
         break;
@@ -155,7 +159,7 @@ void special_func(int key, int x, int y) {
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
-        polygone = addPointToPolygon(polygone, (Point){ x, y });
+        addPointToPolygone(&polygone, (Point){ x, y });
     }
     glutPostRedisplay();
 }
@@ -181,8 +185,7 @@ int main(int argc, char ** argv) {
     glutInit(&argc, argv);
     glutCreateWindow("FAIN - Projet");
 
-    polygone = newPolygon();
-    currentNode = polygone;
+    polygone = newPolygone();
     fill = 0;
 
     glViewport(0, 0, width, height);
