@@ -8,7 +8,7 @@
 #include <GL/gl.h>
 #include <stdio.h>
 
-Polygone newPolygone() {
+Polygone new_polygone() {
     Polygone poly;
     poly.nb_sommets = 0;
     poly.sommets = NULL;
@@ -25,7 +25,7 @@ void insertAfter(struct _sommet * sommet, struct _sommet * newSommet) {
     sommet->next = newSommet;
 }
 
-void addPointToPolygone(Polygone * poly, Point p) {
+void add_point_to_polygone(Polygone * poly, Point p) {
     if (!poly) return;
     if (poly->is_closed) return;
 
@@ -43,9 +43,8 @@ void addPointToPolygone(Polygone * poly, Point p) {
     poly->nb_sommets += 1;
 }
 
-void removePointFromPolygone(Polygone * poly, struct _sommet * sommet) {
+void remove_point_from_polygone(Polygone * poly, struct _sommet * sommet) {
     if (!poly) return;
-    if (!poly->current) return;
 
     if (sommet->next == sommet) {
         poly->last = NULL;
@@ -69,13 +68,10 @@ void removePointFromPolygone(Polygone * poly, struct _sommet * sommet) {
         poly->current = NULL;
     }
 
-    if (poly->is_closed)
-        poly->is_closed = 0;
-
     free(sommet);
 }
 
-void scinderArcInsidePolygone(Polygone * poly) {
+void scinder_arc_inside_polygone(Polygone * poly) {
     if (!poly) return;
     if (!poly->current) return;
 
@@ -91,25 +87,25 @@ void scinderArcInsidePolygone(Polygone * poly) {
     insertAfter(courant, new_sommet);
 }
 
-void nextPointInsidePolygone(Polygone * poly) {
+void next_point_inside_polygone(Polygone * poly) {
     if (!poly->current) poly->current = poly->sommets;
     poly->current = poly->current->next;
 }
 
-void prevPointInsidePolygone(Polygone * poly) {
+void prev_point_inside_polygone(Polygone * poly) {
     if (!poly->current) poly->current = poly->sommets;
     poly->current = poly->current->prev;
 }
 
-void closePolygone(Polygone * poly) {
+void close_polygone(Polygone * poly) {
     poly->is_closed = 1;
 }
 
-void openPolygone(Polygone * poly) {
-    removePointFromPolygone(poly, poly->last);
+void open_polygone(Polygone * poly) {
+    poly->is_closed = 0;
 }
 
-void drawPolygone(Polygone poly) {
+void draw_polygone(Polygone poly) {
     if (!poly.sommets) return;
 
     struct _sommet * sommet = poly.sommets;

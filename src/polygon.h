@@ -19,14 +19,14 @@ struct _polygone {
 
 typedef struct _polygone Polygone;
 
-Polygone newPolygone();
-void addPointToPolygone(Polygone * poly, Point p);
-void removePointFromPolygone(Polygone * poly, struct _sommet * sommet);
-void drawPolygone(Polygone poly);
-void scinderArcInsidePolygone(Polygone * poly);
-void nextPointInsidePolygone(Polygone * poly);
-void prevPointInsidePolygone(Polygone * poly);
-void closePolygone(Polygone * poly);
-void openPolygone(Polygone * poly);
+Polygone new_polygone();
+void add_point_to_polygone(Polygone * poly, Point p);
+void remove_point_from_polygone(Polygone * poly, struct _sommet * sommet);
+void draw_polygone(Polygone poly);
+void scinder_arc_inside_polygone(Polygone * poly);
+void next_point_inside_polygone(Polygone * poly);
+void prev_point_inside_polygone(Polygone * poly);
+void close_polygone(Polygone * poly);
+void open_polygone(Polygone * poly);
 
 #endif // POLYGON_H

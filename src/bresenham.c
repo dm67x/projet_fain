@@ -66,7 +66,7 @@ void bresenham(Point from, Point to) {
     double dx = p2.x - p1.x, dy = p2.y - p1.y;
     double incrd1 = 2 * dy, incrd2 = 2 * (dy - dx);
     double d = 2 * dy - dx;
-    glBegin(GL_LINES);
+    glBegin(GL_POINTS);
     while (p1.x < p2.x) {
         O1_to_Z2(from, to, p1, &p_Z2);
         glVertex2i(p_Z2.x, p_Z2.y);

@@ -1,7 +1,7 @@
 #include "color.h"
 
-Color getPixelColor(GLint x, GLint y) {
-    Color color;
-    glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &color);
-    return color;
+Color get_pixel_color(Point p) {
+    Color c;
+    glReadPixels(p.x, p.y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &c);
+    return c;
 }

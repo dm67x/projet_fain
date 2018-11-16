@@ -30,7 +30,7 @@ void display_func() {
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawPolygone(polygone);
+    draw_polygone(polygone);
 
     if (current_mode == VERTEX && polygone.current) {
         glColor3f(1.0f, 0.0f, 0.0f);
@@ -49,7 +49,6 @@ void display_func() {
     }
 
     if (fill) {
-        glColor3f(1.0f, 0.0f, 1.0f);
         scan_line_fill(polygone);
     }
 
@@ -66,9 +65,9 @@ void keyboard_func(unsigned char key, int x, int y) {
 
     case 'c':
         if (polygone.is_closed)
-            openPolygone(&polygone);
+            open_polygone(&polygone);
         else
-            closePolygone(&polygone);
+            close_polygone(&polygone);
         break;
 
     case 'f':
@@ -104,15 +103,15 @@ void special_func(int key, int x, int y) {
     case VERTEX:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            nextPointInsidePolygone(&polygone);
+            next_point_inside_polygone(&polygone);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            prevPointInsidePolygone(&polygone);
+            prev_point_inside_polygone(&polygone);
             break;
 
         case GLUT_KEY_END:
-            removePointFromPolygone(&polygone, polygone.current);
+            remove_point_from_polygone(&polygone, polygone.current);
             break;
 
         case GLUT_KEY_UP:
@@ -144,11 +143,11 @@ void special_func(int key, int x, int y) {
     case EDGE:
         switch (key) {
         case GLUT_KEY_PAGE_UP:
-            nextPointInsidePolygone(&polygone);
+            next_point_inside_polygone(&polygone);
             break;
 
         case GLUT_KEY_PAGE_DOWN:
-            prevPointInsidePolygone(&polygone);
+            prev_point_inside_polygone(&polygone);
             break;
         }
         break;
@@ -158,9 +157,9 @@ void special_func(int key, int x, int y) {
 
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
-        addPointToPolygone(&polygone, (Point){ x, y });
+        add_point_to_polygone(&polygone, (Point){ x, y });
     } else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP && current_mode == EDGE) {
-        scinderArcInsidePolygone(&polygone);
+        scinder_arc_inside_polygone(&polygone);
     }
     glutPostRedisplay();
 }
@@ -186,7 +185,7 @@ int main(int argc, char ** argv) {
     glutInit(&argc, argv);
     glutCreateWindow("FAIN - Projet");
 
-    polygone = newPolygone();
+    polygone = new_polygone();
     fill = 0;
 
     glViewport(0, 0, width, height);
