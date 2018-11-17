@@ -158,9 +158,15 @@ void special_func(int key, int x, int y) {
 void mouse_func(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == INSERT) {
         add_point_to_polygone(&polygone, (Point){ x, y });
-    } else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP && current_mode == EDGE) {
+    } 
+	else if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP && current_mode == EDGE) {
         scinder_arc_inside_polygone(&polygone);
-    }
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP && current_mode == VERTEX) {
+		struct _sommet * sommet = closest_vertex_from_polygone(&polygone, (Point) { x, y });
+		if (sommet)
+			polygone.current = sommet;
+	}
     glutPostRedisplay();
 }
 

@@ -5,7 +5,6 @@
 #include "scan_line_filling.h"
 #include <stdlib.h>
 #include <GL/gl.h>
-#include "color.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -39,7 +38,32 @@ BoundingBox get_polygone_bounding_box(Polygone polygone) {
     return bb;
 }
 
+// verifier si les droites s'intersectent
+char have_intersection(Point p1, Point p2, Point p3, Point p4) {
+	double alpha, beta, gamma, epsilon;
+	// vecteurs
+	Point i, j, v, w, z;
+	i = (Point) { p2.x - p1.x, p2.y - p1.y };
+	j = (Point) { p4.x - p3.x, p4.y - p3.y };
+	v = (Point) { p3.x - p2.x, p3.y - p2.y };
+	w = (Point) { p4.x - p2.x, p4.y - p2.y };
+	z = (Point) { p1.x - p4.x, p1.y - p4.y };
+
+	alpha = i.y * v.x - i.x * v.y;
+	beta = i.y * w.x - i.x * w.y;
+	gamma = j.y * -w.x - j.x * -w.y;
+	epsilon = j.y * z.x - j.x * z.y;
+
+	if (alpha > 0 && beta < 0 && gamma > 0 && epsilon < 0) return 1;
+	if (alpha > 0 && beta < 0 && gamma < 0 && epsilon > 0) return 1;
+	if (alpha < 0 && beta > 0 && gamma > 0 && epsilon < 0) return 1;
+	if (alpha < 0 && beta > 0 && gamma < 0 && epsilon > 0) return 1;
+	return 0;
+}
+
 char is_inside_polygone(Polygone poly, Point t1, Point t2) {
+	if (!poly.is_closed) return 0;
+
     struct _sommet * sommets = poly.sommets;
     Point p1 = sommets->point, p2;
     sommets = sommets->next;
@@ -50,24 +74,12 @@ char is_inside_polygone(Polygone poly, Point t1, Point t2) {
 
     for (; sommets != poly.sommets; sommets = sommets->next) {
         p2 = sommets->point;
-
-        v = (Point) { p2.x - p1.x, p2.y - p1.y };
-        k = (Point) { t2.x - t1.x, t2.y - t2.x };
-
-        d = v.x * (t1.y - p1.y) - v.y * (t1.x - p1.x);
-        d2 = v.x * (t2.y - p1.y) - v.y * (t2.x - p1.x);
-        d3 = k.x * (p2.y - t1.y) - k.y * (p2.x - t1.x);
-        d4 = k.x * (p1.y - t1.y) - k.y * (p1.x - t1.x);
-
-        if ((d > 0 && d2 < 0 && d3 > 0 && d4 < 0) ||
-                (d < 0 && d2 > 0 && d3 > 0 && d4 < 0) ||
-                (d > 0 && d2 < 0 && d3 < 0 && d4 > 0) ||
-                (d < 0 && d2 > 0 && d3 < 0 && d4 > 0)) {
-            nb_inter++;
-        }
-
+		if (have_intersection(t1, t2, p1, p2)) nb_inter++;
         p1 = p2;
     }
+
+	p2 = sommets->point;
+	if (have_intersection(t1, t2, p1, p2)) nb_inter++;
 
     return (nb_inter % 2) != 0;
 }

@@ -105,6 +105,43 @@ void open_polygone(Polygone * poly) {
     poly->is_closed = 0;
 }
 
+struct _sommet * closest_vertex_from_polygone(Polygone * poly, Point p) {
+	struct _sommet * sommet = poly->sommets;
+	struct _sommet * out = NULL;
+	double d, d2;
+
+	Point top_left = (Point) { p.x - SEARCH_PADDING, p.y - SEARCH_PADDING };
+	Point bottom_right = (Point) { p.x + SEARCH_PADDING, p.y + SEARCH_PADDING };
+
+	if (sommet->point.x > top_left.x
+		&& sommet->point.y > top_left.y
+		&& sommet->point.x < bottom_right.x
+		&& sommet->point.y < bottom_right.y)
+	{
+		out = sommet;
+	}
+
+	sommet = sommet->next;
+
+	for (; sommet != poly->sommets; sommet = sommet->next) {
+		if (sommet->point.x > top_left.x
+			&& sommet->point.y > top_left.y
+			&& sommet->point.x < bottom_right.x
+			&& sommet->point.y < bottom_right.y)
+		{
+			if (!out) out = sommet;
+			else {
+				d = sqrt((sommet->point.x - p.x) * (sommet->point.x - p.x) + (sommet->point.y - p.y) * (sommet->point.y - p.y));
+				d2 = sqrt((out->point.x - p.x) * (out->point.x - p.x) + (out->point.y - p.y) * (out->point.y - p.y));
+
+				if (d < d2) out = sommet;
+			}
+		}
+	}
+
+	return out;
+}
+
 void draw_polygone(Polygone poly) {
     if (!poly.sommets) return;
 

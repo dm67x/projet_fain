@@ -3,6 +3,8 @@
 
 #include "point.h"
 
+#define SEARCH_PADDING 20
+
 struct _sommet {
     struct _sommet * next;
     struct _sommet * prev;
@@ -28,5 +30,6 @@ void next_point_inside_polygone(Polygone * poly);
 void prev_point_inside_polygone(Polygone * poly);
 void close_polygone(Polygone * poly);
 void open_polygone(Polygone * poly);
+struct _sommet * closest_vertex_from_polygone(Polygone * poly, Point p);
 
 #endif // POLYGON_H
