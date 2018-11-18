@@ -67,6 +67,8 @@ void remove_point_from_polygone(Polygone * poly, struct _sommet * sommet) {
         poly->sommets = NULL;
         poly->current = NULL;
     }
+	
+	open_polygone(poly);
 
     free(sommet);
 }
@@ -112,6 +114,8 @@ struct _sommet * closest_vertex_from_polygone(Polygone * poly, Point p) {
 
 	Point top_left = (Point) { p.x - SEARCH_PADDING, p.y - SEARCH_PADDING };
 	Point bottom_right = (Point) { p.x + SEARCH_PADDING, p.y + SEARCH_PADDING };
+
+	if (!sommet) return NULL;
 
 	if (sommet->point.x > top_left.x
 		&& sommet->point.y > top_left.y

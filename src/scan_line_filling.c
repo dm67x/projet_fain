@@ -8,6 +8,7 @@
 #include <math.h>
 #include <stdio.h>
 
+// Récupérer la bounding box (le fond)
 BoundingBox get_polygone_bounding_box(Polygone polygone) {
     int padding = 2;
     BoundingBox bb;
@@ -39,6 +40,8 @@ BoundingBox get_polygone_bounding_box(Polygone polygone) {
 }
 
 // verifier si les droites s'intersectent
+// pour cela je regarder les determinants des vecteurs i, j, v, w, z et -w
+// si leurs déterminants s'opposent + et - alors intersection
 char have_intersection(Point p1, Point p2, Point p3, Point p4) {
 	double alpha, beta, gamma, epsilon;
 	// vecteurs
@@ -61,6 +64,9 @@ char have_intersection(Point p1, Point p2, Point p3, Point p4) {
 	return 0;
 }
 
+// Verification si le point est à l'intérieur du polygone
+// Pour cela on verifie le nombre d'intersection de la droite partant du point t1 vers t2
+// Si le résultat est impair alors le point t1 est dans le polygone sinon le point est à l'extérieur du polygone
 char is_inside_polygone(Polygone poly, Point t1, Point t2) {
 	if (!poly.is_closed) return 0;
 

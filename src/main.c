@@ -6,8 +6,6 @@
 #include <GL/gl.h>
 #include <stdio.h>
 
-#define DEBUG 1
-
 #include "bresenham.h"
 #include "polygon.h"
 #include "scan_line_filling.h"
@@ -63,6 +61,11 @@ void keyboard_func(unsigned char key, int x, int y) {
     case 27:
         exit(0);
 
+	case 127:
+		if (current_mode == VERTEX) 
+			remove_point_from_polygone(&polygone, polygone.current);
+		break;
+
     case 'c':
         if (polygone.is_closed)
             open_polygone(&polygone);
@@ -108,10 +111,6 @@ void special_func(int key, int x, int y) {
 
         case GLUT_KEY_PAGE_DOWN:
             prev_point_inside_polygone(&polygone);
-            break;
-
-        case GLUT_KEY_END:
-            remove_point_from_polygone(&polygone, polygone.current);
             break;
 
         case GLUT_KEY_UP:
@@ -172,19 +171,17 @@ void mouse_func(int button, int state, int x, int y) {
 
 int main(int argc, char ** argv) {
     int width = 800, height = 800;
-#ifndef DEBUG
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Usage: %s width [height]\n", argv[0]);
+    if (argc > 3) {
+        fprintf(stderr, "Usage: %s [width] [height]\n", argv[0]);
         return EXIT_FAILURE;
     } else {
         if (argc == 2) {
             width = height = atoi(argv[1]);
-        } else {
+        } else if (argc == 3) {
             width = atoi(argv[1]);
             height = atoi(argv[2]);
         }
     }
-#endif
 
     glutInitWindowSize(width, height);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
