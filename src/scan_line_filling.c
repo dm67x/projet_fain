@@ -10,7 +10,6 @@
 
 // Récupérer la bounding box (le fond)
 BoundingBox get_polygone_bounding_box(Polygone polygone) {
-    int padding = 2;
     BoundingBox bb;
     bb.min = bb.max = (Point) { -1, -1 };
 
@@ -30,11 +29,6 @@ BoundingBox get_polygone_bounding_box(Polygone polygone) {
         if (bb.max.y < p.y) bb.max.y = p.y;
         sommet = sommet->next;
     }
-
-    bb.min.x -= padding;
-    bb.min.y -= padding;
-    bb.max.x += padding;
-    bb.max.y += padding;
 
     return bb;
 }
@@ -73,21 +67,18 @@ char is_inside_polygone(Polygone poly, Point t1, Point t2) {
     struct _sommet * sommets = poly.sommets;
     Point p1 = sommets->point, p2;
     sommets = sommets->next;
-    unsigned int nb_inter = 0;
-    double d, d2, d3, d4;
-
-    Point v, k;
+	char r = 0;
 
     for (; sommets != poly.sommets; sommets = sommets->next) {
         p2 = sommets->point;
-		if (have_intersection(t1, t2, p1, p2)) nb_inter++;
+		if (have_intersection(t1, t2, p1, p2)) r = !r;
         p1 = p2;
     }
 
 	p2 = sommets->point;
-	if (have_intersection(t1, t2, p1, p2)) nb_inter++;
+	if (have_intersection(t1, t2, p1, p2)) r = !r;
 
-    return (nb_inter % 2) != 0;
+    return r;
 }
 
 void scan_line_fill(Polygone polygone) {
